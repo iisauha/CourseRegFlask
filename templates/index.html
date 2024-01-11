@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course Dropdown</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        #course-form {
+            margin: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        #course-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #selected-courses {
+            margin: 20px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #selected-courses h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        #selected-courses-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 0;
+        }
+        #selected-courses-list li {
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        #course-button-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 10px;
+        }
+        #add-course-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #3498db;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #add-course-button:hover {
+            background-color: #2980b9;
+        }
+        #action-buttons {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .action-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        #generate-button {
+            background-color: #4caf50;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        #generate-button:hover {
+            background-color: #45a049;
+        }
+        #clear-button {
+            background-color: #f44336;
+            color: #fff;
+            transition: background-color 0.3s;
+        }
+        #clear-button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <form id="course-form">
+        <h1 style="color: #40642c;">Sarah Lawrence College Course Scheduling</h1>
+        <label for="course">Select a Course:</label>
+        <input type="text" id="course-input" list="courses" name="course">
+        <datalist id="courses">
+            {% for title in course_titles %}
+            <option value="{{ title }}">
+            {% endfor %}
+        </datalist>
+        <div id="course-button-container">
+            <button id="add-course-button">Add Course</button>
+        </div>
+    </form>
+
+    <div id="selected-courses">
+        <h2>Selected Courses:</h2>
+        <ul id="selected-courses-list">
+        </ul>
+        <div id="action-buttons">
+            <button id="generate-button" class="action-button">Generate Schedule</button>
+            <button id="clear-button" class="action-button">Clear Selected Courses</button>
+        </div>
+    </div>
+
+    <script>
+        const courseForm = document.getElementById('course-form');
+        const selectedCoursesList = document.getElementById('selected-courses-list');
+        const addButton = document.getElementById('add-course-button');
+        const generateButton = document.getElementById('generate-button');
+        const clearButton = document.getElementById('clear-button');
+
+        courseForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const courseInput = document.getElementById('course-input');
+            const selectedCourse = courseInput.value.trim();
+
+            if (selectedCourse !== '') {
+                const listItem = document.createElement('li');
+                listItem.textContent = selectedCourse;
+            selectedCoursesList.appendChild(listItem);
+                
+                selectedCoursesList.insertBefore(listItem, selectedCoursesList.firstChild);
+                courseInput.value = '';
+            }
+        });
+
+        addButton.addEventListener('click', function() {
+            const courseInput = document.getElementById('course-input');
+            const selectedCourse = courseInput.value.trim();
+
+            if (selectedCourse !== '') {
+                const listItem = document.createElement('li');
+                listItem.textContent = selectedCourse;
+                selectedCoursesList.insertBefore(listItem, selectedCoursesList.firstChild);
+                courseInput.value = '';
+            }
+        });
+
+        clearButton.addEventListener('click', function() {
+            selectedCoursesList.innerHTML = '';
+        });
+
+        generateButton.addEventListener('click', function() {
+            const selectedCourseItems = selectedCoursesList.getElementsByTagName('li');
+            const selectedCourseTitles = [];
+            
+            for (const item of selectedCourseItems) {
+                selectedCourseTitles.push(item.textContent);
+            }
+
+            const url = "/generate_schedule?courses=" + encodeURIComponent(selectedCourseTitles.join('|'));
+
+            window.location.href = url;
+        });
+
+    </script>
+</body>
+</html>
